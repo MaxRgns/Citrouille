@@ -1,3 +1,5 @@
 .container {
     margin-top: 5%;
+    width:30em;
+    border: 1px solid black;
 }

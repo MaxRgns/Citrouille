@@ -18,7 +18,7 @@
 
     while ($row = $res->fetch_assoc()) {
         
-        if ($row['user_admin'] == 1) {
+        if ($row['user_admin'] == 0) {
             echo "<br>" . $row['nom_user'] . "<br>";
         }
     }
