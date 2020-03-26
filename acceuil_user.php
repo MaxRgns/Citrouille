@@ -10,6 +10,6 @@
     <title>Trouver le mot</title>
 </head>
 <body>
-    
+    <p>acceuil user</p>
 </body>
 </html>

@@ -1,42 +1,46 @@
 <?php
 
-try {
-  $bdd = new PDO('mysql:host=127.0.0.1;dbname=citrouille', 'root', '');
+session_start();
 
-  if (isset($_POST['formConnexion'])) {
+$bdd = new PDO('mysql:host=127.0.0.1;dbname=citrouille', 'root', '');
 
-    $pseudoConnect = htmlspecialchars($_POST['pseudoConnect']);
-    $mdpConnect = $_POST['mdpConnect'];
-    echo $mdpConnect;
+if (isset($_POST['formConnexion'])) {
+
+  // Vérification de l'adresse mail
+  $select = $bdd->prepare('SELECT * FROM utilisateurs WHERE mail_user = ?');
+
+  $select->bindValue(1, $_POST['mailConnect'], PDO::PARAM_STR);
+  $select->execute();
+  $resultat = $select->fetch();
+
+  if (password_verify($_POST['mdpConnect'], $resultat['password_user'])) // Si le mot de passe saisi correspond au hash de la base de données
+  {
+    echo "ok";
+    $_SESSION['id'] = $resultat['id_user'];
+    $_SESSION['admin'] = $resultat['user_admin'];
+    $_SESSION['nom_user'] = $resultat['nom_user'];
+    $_SESSION['prenom_user'] = $resultat['prenom_user'];
+    $_SESSION['mail_user'] = $resultat['mail_user'];
+    $_SESSION['pseudo_user'] = $resultat['pseudo'];
+    
 
 
-
-    if (!empty($pseudoConnect) && !empty($mdpConnect)) {
-
-      $reqUser = $bdd->prepare("SELECT * FROM utilisateurs WHERE pseudo = ? AND password_user = ?");
-
-      $reqUser->execute(
-        array($pseudoConnect, $mdpConnect)
-      );
-      // $passworVerify[] = password_verify($mdpConnect, $reqUser['password_user']);
-      echo $reqUser['password_user'];
-      $userExist = $reqUser->rowCount();
-
-      
-
-
-      // if ($userExist && password_verify($mdpConnect, $reqUser['password_user'])) {
-      //   $_SESSION[""];
-      // } else {
-      //   $erreurLogin = "Mauvais email ou mot de passe";
-      // }
-    }
+    
+  } else // Si le mot de passe est incorrect
+  {
+    $erreurLogin = "Mot de passe incorrect";
   }
-} catch (PDOException $e) {
-  $message = $e->getMessage();
+
+  if (isset($_SESSION['admin']) and $_SESSION['admin'] == 1) // Si l'utilisateur est un admin
+  {
+    header("Location: profil_admin.php?id=".$_SESSION['id'].""); // Envoie sur l'espace administrateur
+  }
+
+  if (isset($_SESSION['admin']) and $_SESSION['admin'] == 0) // Si l'utilisateur est un simple membre
+  {
+    header("Location: profil_user.php?id=".$_SESSION['id'].""); // Envoie sur l'espace membre
+  }
 }
-
-
 ?>
 
 <!DOCTYPE html>
@@ -89,7 +93,7 @@ try {
 
       <div class="row">
         <div class="col-8 mx-auto form-group">
-          <input type="text" class="form-control" name="pseudoConnect" id="exampleInputPseudo" placeholder="Pseudo" required>
+          <input type="email" class="form-control" name="mailConnect" id="exampleInputEmail" placeholder="Email" required>
         </div>
       </div>
 

@@ -1,5 +1,20 @@
-.container {
-    margin-top: 5%;
-    width:30em;
-    border: 1px solid black;
+.changeAvatar {
+    visibility: hidden;
+}
+
+img{
+    visibility: visible;
+}
+
+a:hover {
+    visibility: visible;
+    text-decoration: none;
+}
+
+button:focus {
+    outline: 0;
+}
+
+.navbar .form-control {
+    width: 200px;
 }
