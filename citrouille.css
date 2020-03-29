@@ -1,0 +1,71 @@
+	.bienvenue{
+		text-align: center;
+		font-size: 125%;
+	}
+	.avatar{
+		display: block;
+		margin-left: auto;
+		margin-right: auto ;
+		width: 20%;
+		height: 20%;
+	}
+	.infos{
+		text-align: center;
+		font-size: 125%;
+	}
+	.image{
+		display: block;
+		margin-left: auto;
+		margin-right: auto ;
+		width: 30%;
+		height: 30%;
+		border: none;
+		-moz-border-radius : 75px;
+		-webkit-border-radius : 75px;
+		border-radius : 75px;
+	}
+	.son{
+		text-align: center;
+	}
+	.mot{
+		text-align: center;
+	}
+	.lettres{
+		padding: 30px;
+		text-align: center;
+	}
+	.letter{
+		margin: 10px;
+		text-align: center;
+		width: 120px;
+		height: 120px;
+		border-radius:40px 40px 40px 40px;
+	}
+	.opérations{
+		padding: 30px;
+		text-align: center;
+	}
+	/*Bouton effacer*/
+	.effacer{
+		text-align: center;
+		width: 120px;
+		height: 80px;
+		border-radius:20px 20px 20px 20px;
+		background: red;
+	}
+	/*Bouton réinitialiser*/
+	.réinitialiser{
+		text-align: center;
+		width: 120px;
+		height: 80px;
+		border-radius:20px 20px 20px 20px;
+		background: grey;
+	}
+	/*Bouton valider*/
+	.valider{
+		text-align: center;
+		width: 120px;
+		height: 80px;
+		border-radius:20px 20px 20px 20px;
+		background: green;
+	}
