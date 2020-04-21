@@ -1,3 +1,8 @@
+<?php
+session_start();
+
+echo $_SESSION['id'];
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -6,6 +11,6 @@
     <title>Document</title>
 </head>
 <body>
-    <p>profil_admin</p>
+    
 </body>
 </html>

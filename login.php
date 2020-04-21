@@ -2,7 +2,7 @@
 
 session_start();
 
-$bdd = new PDO('mysql:host=127.0.0.1;dbname=citrouille', 'root', '');
+require 'PDOconnexion.php';
 
 if (isset($_POST['formConnexion'])) {
 
@@ -15,30 +15,25 @@ if (isset($_POST['formConnexion'])) {
 
   if (password_verify($_POST['mdpConnect'], $resultat['password_user'])) // Si le mot de passe saisi correspond au hash de la base de données
   {
-    echo "ok";
     $_SESSION['id'] = $resultat['id_user'];
     $_SESSION['admin'] = $resultat['user_admin'];
     $_SESSION['nom_user'] = $resultat['nom_user'];
     $_SESSION['prenom_user'] = $resultat['prenom_user'];
     $_SESSION['mail_user'] = $resultat['mail_user'];
     $_SESSION['pseudo_user'] = $resultat['pseudo'];
-    
-
-
-    
   } else // Si le mot de passe est incorrect
   {
     $erreurLogin = "Mot de passe incorrect";
   }
 
-  if (isset($_SESSION['admin']) and $_SESSION['admin'] == 1) // Si l'utilisateur est un admin
+  if (isset($_SESSION['admin']) && $_SESSION['admin'] == 1) // Si l'utilisateur est un admin
   {
-    header("Location: profil_admin.php?id=".$_SESSION['id'].""); // Envoie sur l'espace administrateur
+    header("Location: profil_admin.php?id=" . $_SESSION['id']); // Envoie sur l'espace administrateur
   }
 
-  if (isset($_SESSION['admin']) and $_SESSION['admin'] == 0) // Si l'utilisateur est un simple membre
+  if (isset($_SESSION['admin']) && $_SESSION['admin'] == 0) // Si l'utilisateur est un simple membre
   {
-    header("Location: profil_user.php?id=".$_SESSION['id'].""); // Envoie sur l'espace membre
+    header("Location: profil_user.php?id=" . $_SESSION['id']); // Envoie sur l'espace membre
   }
 }
 ?>
@@ -62,7 +57,7 @@ if (isset($_POST['formConnexion'])) {
 
   <div class="container">
 
-    <form method="POST" action="">
+    <form method="POST">
 
       <div class="row justify-content-center">
         <div class="col-5">

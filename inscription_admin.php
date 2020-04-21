@@ -1,5 +1,5 @@
 <?php
-$bdd = new PDO('mysql:host=127.0.0.1;dbname=citrouille', 'root', '');
+require 'PDOconnexion.php';
 
 if (isset($_POST['formIns'])) {
 
@@ -27,7 +27,7 @@ if (isset($_POST['formIns'])) {
                 if ($pseudoExist == 0) {
                     if ($mailExist == 0) {
                         if ($mdp == $mdpConf) {
-                            $insertUser = $bdd->prepare('INSERT INTO utilisateurs(prenom_user, nom_user, mail_user, password_user, user_admin, pseudo) VALUES(? , ?, ?, ?, 0, ?)');
+                            $insertUser = $bdd->prepare("INSERT INTO `utilisateurs` (`id_user`,`prenom_user`, `nom_user`, `mail_user`,`password_user`,`user_admin`, `pseudo`, `avatar`, `id_classe`) VALUES (NULL,?, ?, ?, ?, 0, ?, NULL, NULL)");
                             $insertUser->execute(array($prenom, $nom, $email, $hasheMdp, $pseudo));
                             $creationValid = "Votre compte a bien été créé !";
                             header('Location:login.php');

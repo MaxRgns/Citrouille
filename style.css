@@ -1,20 +1,19 @@
-.changeAvatar {
-    visibility: hidden;
+.changeAvatar>input {
+    display: none;
 }
 
 img{
     visibility: visible;
 }
 
-a:hover {
-    visibility: visible;
-    text-decoration: none;
-}
-
 button:focus {
     outline: 0;
 }
 
-.navbar .form-control {
+/* .navbar .form-control {
     width: 200px;
+} */
+
+.btn a{
+    text-decoration: none;
 }
