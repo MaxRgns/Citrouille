@@ -29,7 +29,7 @@ if (isset($_POST['formIns'])) {
                         if ($mdp == $mdpConf) {
                             $insertUser = $bdd->prepare("INSERT INTO `utilisateurs` (`id_user`,`prenom_user`, `nom_user`, `mail_user`,`password_user`,`user_admin`, `pseudo`, `avatar`) VALUES (NULL,?, ?, ?, ?, 1, ?, NULL)");
                             $insertUser->execute(array($prenom, $nom, $email, $hasheMdp, $pseudo));
-                            print_r($insertUser);
+                           
                             $creationValid = "Votre compte a bien été créé !";
                         } else {
                             $erreurMdp = "Vos mots de passes ne correspondent pas !";

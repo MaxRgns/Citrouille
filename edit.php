@@ -12,89 +12,67 @@ if (isset($_SESSION['id'])) {   //Condition
         $newNom = htmlspecialchars($_POST['newNom']);
         $insertNom = $bdd->prepare("UPDATE utilisateurs SET nom_user = ? WHERE id_user = ?");
         $insertNom->execute(array($newNom, $_SESSION['id']));
-        if ($_SESSION['admin'] == 1) {
-            header('Location: profil_admin.php?id=' . $_SESSION['id']);
-        } else {
+        header('Location: profil_user.php?id=' . $_SESSION['id']);
+
+        if (isset($_POST['newPrenom']) && !empty($_POST['newPrenom']) && $_POST['newPrenom'] != $user['prenom_user']) {
+            $newPrenom = htmlspecialchars($_POST['newPrenom']);
+            $insertPrenom = $bdd->prepare("UPDATE utilisateurs SET prenom_user = ? WHERE id_user = ?");
+            $insertPrenom->execute(array($newPrenom, $_SESSION['id']));
             header('Location: profil_user.php?id=' . $_SESSION['id']);
-        }
-    }
 
-    if (isset($_POST['newPrenom']) && !empty($_POST['newPrenom']) && $_POST['newPrenom'] != $user['prenom_user']) {
-        $newPrenom = htmlspecialchars($_POST['newPrenom']);
-        $insertPrenom = $bdd->prepare("UPDATE utilisateurs SET prenom_user = ? WHERE id_user = ?");
-        $insertPrenom->execute(array($newPrenom, $_SESSION['id']));
-        if ($_SESSION['admin'] == 1) {
-            header('Location: profil_admin.php?id=' . $_SESSION['id']);
-        } else {
-            header('Location: profil_user.php?id=' . $_SESSION['id']);
-        }
-    }
 
-    if (isset($_POST['save'])) {
+            if (isset($_POST['save'])) {
 
-        if (filter_var($_POST['newMail'], FILTER_VALIDATE_EMAIL)) {
+                if (filter_var($_POST['newMail'], FILTER_VALIDATE_EMAIL)) {
 
-            if (isset($_POST['newMail']) && !empty($_POST['newMail']) && $_POST['newMail'] != $user['mail_user']) {
-                $newMail = ($_POST['newMail']);
-                $reqMail = $bdd->prepare("SELECT * FROM utilisateurs WHERE mail_user = ?"); //on recherche si le mail existe déjà
-                $reqMail->execute(array($newMail));
-                $mailExist = $reqMail->rowCount();
-                if ($mailExist == 0) {
-                    $insertMail = $bdd->prepare("UPDATE utilisateurs SET mail_user = ? WHERE id_user = ?");
-                    $insertMail->execute(array($newMail, $_SESSION['id']));
-                    if ($_SESSION['admin'] == 1) {
-                        header('Location: profil_admin.php?id=' . $_SESSION['id']);
-                    } else {
+                    if (isset($_POST['newMail']) && !empty($_POST['newMail']) && $_POST['newMail'] != $user['mail_user']) {
+                        $newMail = ($_POST['newMail']);
+                        $reqMail = $bdd->prepare("SELECT * FROM utilisateurs WHERE mail_user = ?"); //on recherche si le mail existe déjà
+                        $reqMail->execute(array($newMail));
+                        $mailExist = $reqMail->rowCount();
+                        if ($mailExist == 0) {
+                            $insertMail = $bdd->prepare("UPDATE utilisateurs SET mail_user = ? WHERE id_user = ?");
+                            $insertMail->execute(array($newMail, $_SESSION['id']));
+                            header('Location: profil_user.php?id=' . $_SESSION['id']);
+                        } else {
+                            $erreurEmailExist = "Adresse mail déjà utilisée";
+                        }
+                    }
+                }
+            }
+
+            if (isset($_POST['newPseudo']) && isset($_POST['save'])) {
+                $newPseudo = htmlspecialchars($_POST['newPseudo']);
+
+                $reqPseudo = $bdd->prepare("SELECT * FROM utilisateurs WHERE pseudo = ?");  //on recherche si le pseudo existe déjà
+                $reqPseudo->execute(array($newPseudo));
+                $pseudoExist = $reqPseudo->rowCount();
+
+                if ($pseudoExist == 0) {
+
+                    if (isset($_POST['newPseudo']) && !empty($_POST['newPseudo'])) {
+                        $insertPseudo = $bdd->prepare("UPDATE utilisateurs SET pseudo = ? WHERE id_user = ?");
+                        $insertPseudo->execute(array($newPseudo, $_SESSION['id']));
                         header('Location: profil_user.php?id=' . $_SESSION['id']);
                     }
                 } else {
-                    $erreurEmailExist = "Adresse mail déjà utilisée";
+                    $erreurPseudoExist = "Pseudo déjà utilisé";
                 }
             }
-        }
-    }
 
-    if (isset($_POST['newPseudo']) && isset($_POST['save'])) {
-        $newPseudo = htmlspecialchars($_POST['newPseudo']);
+            if (isset($_POST['newMdp']) && !empty($_POST['newMdp']) && $_POST['newMdpConf'] && !empty($_POST['newMdpConf'])) {
+                $newMdpHashes = password_hash($_POST['newMdp'], PASSWORD_DEFAULT);
 
-        $reqPseudo = $bdd->prepare("SELECT * FROM utilisateurs WHERE pseudo = ?");  //on recherche si le pseudo existe déjà
-        $reqPseudo->execute(array($newPseudo));
-        $pseudoExist = $reqPseudo->rowCount();
-
-        if ($pseudoExist == 0) {
-
-            if (isset($_POST['newPseudo']) && !empty($_POST['newPseudo'])) {
-                $insertPseudo = $bdd->prepare("UPDATE utilisateurs SET pseudo = ? WHERE id_user = ?");
-                $insertPseudo->execute(array($newPseudo, $_SESSION['id']));
-                if ($_SESSION['admin'] == 1) {
-                    header('Location: profil_admin.php?id=' . $_SESSION['id']);
-                } else {
+                if ($_POST['newMdp'] == $_POST['newMdpConf']) {
+                    $insertNewMdp = $bdd->prepare("UPDATE utilisateurs SET password_user = ? WHERE id_user = ?");
+                    $insertNewMdp->execute(array($newMdpHashes, $_SESSION['id']));
                     header('Location: profil_user.php?id=' . $_SESSION['id']);
+                } else {
+                    $erreurMdp = "Les mots de passes de correspondent pas.";
                 }
             }
-        } else {
-            $erreurPseudoExist = "Pseudo déjà utilisé";
         }
     }
-
-    if (isset($_POST['newMdp']) && !empty($_POST['newMdp']) && $_POST['newMdpConf'] && !empty($_POST['newMdpConf'])) {
-        $newMdpHashes = password_hash($_POST['newMdp'], PASSWORD_DEFAULT);
-
-        if ($_POST['newMdp'] == $_POST['newMdpConf']) {
-            $insertNewMdp = $bdd->prepare("UPDATE utilisateurs SET password_user = ? WHERE id_user = ?");
-            $insertNewMdp->execute(array($newMdpHashes, $_SESSION['id']));
-            if ($_SESSION['admin'] == 1) {
-                header('Location: profil_admin.php?id=' . $_SESSION['id']);
-            } else {
-                header('Location: profil_user.php?id=' . $_SESSION['id']);
-            }
-        } else {
-            $erreurMdp = "Les mots de passes de correspondent pas.";
-        }
-    }
-
-
-
 
 ?>
     <html lang="fr">
