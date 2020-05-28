@@ -26,15 +26,8 @@ if (isset($_POST['formConnexion'])) {
     $erreurLogin = "Mot de passe incorrect";
   }
 
-  if (isset($_SESSION['admin']) && $_SESSION['admin'] == 1) // Si l'utilisateur est un admin
-  {
-    header("Location: profil_admin.php?id=" . $_SESSION['id']); // Envoie sur l'espace administrateur
-  }
-
-  if (isset($_SESSION['admin']) && $_SESSION['admin'] == 0) // Si l'utilisateur est un simple membre
-  {
-    header("Location: profil_user.php?id=" . $_SESSION['id']); // Envoie sur l'espace membre
-  }
+  header("Location: profil_user.php?id=" . $_SESSION['id']); // Envoie sur l'espace membre
+ 
 }
 ?>
 
@@ -60,7 +53,7 @@ if (isset($_POST['formConnexion'])) {
     <form method="POST">
 
       <div class="row justify-content-center">
-        <div class="col-5">
+        <div class="col-2">
           <br>
           <h3>Connexion</h3>
           <br>
@@ -87,20 +80,20 @@ if (isset($_POST['formConnexion'])) {
       ?>
 
       <div class="row">
-        <div class="col-8 mx-auto form-group">
+        <div class="col-5 mx-auto form-group">
           <input type="email" class="form-control" name="mailConnect" id="exampleInputEmail" placeholder="Email" required>
         </div>
       </div>
 
       <div class="row">
-        <div class="col-8 mx-auto form-group">
+        <div class="col-5 mx-auto form-group">
           <input type="password" class="form-control" name="mdpConnect" id="exampleInputPassword" placeholder="Mot de passe" required>
 
         </div>
       </div>
 
       <div class="row">
-        <div class="col-4 mx-auto">
+        <div class="col-1 mx-auto">
           <button name="formConnexion" type="submit" class="btn btn-primary">Se connecter</button>
         </div>
       </div>

@@ -12,7 +12,7 @@
 </head>
 
 <body>
-<p>accueil</p>
+<?php header('Location: login.php'); ?>
 </body>
 
 </html>

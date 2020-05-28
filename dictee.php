@@ -4,22 +4,21 @@ require 'PDOconnexion.php';
 session_start();
 
 
-if(isset($_SESSIO['mot'])){
+if(isset($_SESSION['mot'])){
     $req = $bdd->prepare("SELECT mot FROM mots");
     $req->execute();
     $listMots = $req->fetchAll(PDO::FETCH_COLUMN, 0); //récupération de la liste de mot de la bdd
-    
 }
 
-// var_dump($listMots);
+var_dump($listMots);
 
 // $countWords = $req->rowCount(); //count de toutes les row de la bdd mot
-// $randomWords = rand(0, ($countWords)-1); // sort une row random
+// $randomWords = rand(0, ($countWords)-1); //sort une row random
 // echo $randomWords;
 
 srand(12345);
 $shuffled = str_shuffle($listMots[0]);
-// $shuffled = str_shuffle($listMots[$randomWords]); // mélange du mot random
+// $shuffled = str_shuffle($listMots[$randomWords]); //mélange du mot random
 ?>
 
 <!DOCTYPE html>

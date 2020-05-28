@@ -9,7 +9,6 @@ if (isset($_POST['nomClasse']) && !empty($_POST['nomClasse']) && isset($_POST['c
     $idClasse = $bdd->prepare("SELECT id_classe FROM classe WHERE nom_classe = ?");
     $idClasse->execute(array($_POST['nomClasse']));
     $id = $idClasse->fetch(PDO::FETCH_ASSOC);
-    print_r($id['id_classe']);
 
     if (isset($_POST['csvUpload'])) {
         if (!empty($_FILES['csv']['name'])) {
@@ -23,7 +22,7 @@ if (isset($_POST['nomClasse']) && !empty($_POST['nomClasse']) && isset($_POST['c
                     $pseudoEleve = $item1 . " " . $item2;
                     $passwordEleve = password_hash(strtolower($data[1]), PASSWORD_DEFAULT);
                     $avatarEleve = "";
-                    $insertClasse = $bdd->prepare("INSERT INTO `utilisateurs` (`id_user`,`prenom_user`, `nom_user`, `mail_user`,`password_user`,`user_admin`, `pseudo`, `avatar`, `id_classe`) VALUES (NULL,?, ?, ?, ?, 0, ?, ?, ?)");
+                    $insertClasse = $bdd->prepare("INSERT INTO `utilisateurs` (`id_user`,`prenom_user`, `nom_user`, `mail_user`,`password_user`,`user_admin`, `pseudo`, `avatar`, `id_classe_eleve`) VALUES (NULL,?, ?, ?, ?, 0, ?, ?, ?)");
                     $insertClasse->execute(array($item1, $item2, $item3, $passwordEleve, $pseudoEleve, $avatarEleve, $id['id_classe']));
                 }
                 fclose($fileCsv);
@@ -104,35 +103,45 @@ if (isset($_POST['nomClasse']) && !empty($_POST['nomClasse']) && isset($_POST['c
         $infoEleve = $reqInfoEleve->fetchAll();
 
         ?>
-<div class="container">
-    <table class="table">
-            <thead class="thead-dark">
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Prénom</th>
-                    <th scope="col">Nom</th>
-                    <th scope="col">Email</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                $i = 1;
-                foreach ($infoEleve as $info) {
-                ?>
-                    <tr>
-                        <th scope="row"><?php echo $i++;  ?></th>
-                        <td><?php echo $info[0]; ?></td>
-                        <td><?php echo $info[1]; ?></td>
-                        <td><?php echo $info[2]; ?></td>
-                    </tr>
-                <?php
-                }
-                ?>
-            </tbody>
-        </table>
 
-</div>
-        
+        <br><br>
+        <caption><?php echo $_POST['nomClasse']; ?></caption>
+        <div class="container">
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Prénom</th>
+                        <th scope="col">Nom</th>
+                        <th scope="col">Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $i = 1;
+                    foreach ($infoEleve as $info) {
+                    ?>
+                        <tr>
+                            <th scope="row"><?php echo $i++;  ?></th>
+                            <td><?php echo $info[0]; ?></td>
+                            <td><?php echo $info[1]; ?></td>
+                            <td><?php echo $info[2]; ?></td>
+                        </tr>
+                    <?php
+                    }
+                    ?>
+                </tbody>
+            </table>
+            <div class="row justify-content-center">
+                <a href="mailto:<?php foreach ($infoEleve as $info) {
+                                   echo $info[2].";";
+                                } ?>
+                                ?subject=Première connexion à Citrouille
+                                   &body=Lien de la connexion : http://localhost/Citrouille/login.php"> 
+                    <button class="btn btn-primary">Envoyer un e-mail de connexion.</button></a>
+            </div>
+        </div>
+
 
         <script>
             // Add the following code if you want the name of the file appear on select
