@@ -2,13 +2,9 @@
 require 'PDOconnexion.php';
 
 session_start();
-
-
-if(isset($_SESSION['mot'])){
     $req = $bdd->prepare("SELECT mot FROM mots");
     $req->execute();
     $listMots = $req->fetchAll(PDO::FETCH_COLUMN, 0); //récupération de la liste de mot de la bdd
-}
 
 var_dump($listMots);
 
@@ -51,6 +47,7 @@ $shuffled = str_shuffle($listMots[0]);
         }
         // }
         ?>
+        <input name="motValide" type="submit" value="Valider">
     </form>
 </body>
 <?php

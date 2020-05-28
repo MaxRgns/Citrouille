@@ -39,7 +39,7 @@ if (isset($_POST['submit'])) {
                     move_uploaded_file($sonTmpName, $sonDest);
 
                     $reqMotExist = $bdd->prepare("SELECT mot FROM mots WHERE mot = ?");  //on recherche si le mot existe déjà
-                    $reqMotExist->execute(array(isset($_POST['mot'])));
+                    $reqMotExist->execute(array($_POST['mot']));
                     $motExist = $reqMotExist->rowCount();
 
 
@@ -53,7 +53,6 @@ if (isset($_POST['submit'])) {
                         $uploadSuccess = "Le mot a bien été ajouté.";
                     } else {
                         $erreurMotExist = "Mot déjà existant dans la base";
-                       
                     }
                 } else {
                     $erreurVolum = "fichier trop volumineux";
@@ -95,13 +94,13 @@ if (isset($_POST['submit'])) {
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" role="navigation">
         <div class="container">
-            <a class="navbar-brand" href="#">Brand</a>
+            <a class="navbar-brand" href="#">Citrouille</a>
             <button class="navbar-toggler border-0" type="button" data-toggle="collapse" data-target="#exCollapsingNavbar">
                 &#9776;
             </button>
             <div class="collapse navbar-collapse" id="exCollapsingNavbar">
                 <ul class="nav navbar-nav flex-row justify-content-between ml-auto">
-                    <li class="nav-item order-3 order-md-1"><a href="<?php echo "profil_user.php?id=" . $_SESSION['id'] . "" ?>" class="nav-link" title="settings"><i class="fas fa-cog"></i></a></li>
+                    <li class="nav-item order-3 order-md-1"><a href="<?php echo "profil_user.php?id=" . $_SESSION['id'] . "" ?>" class="nav-link" title="settings"><i class="fas fa-user-circle"></i></a></li>
                     <li class="nav-item order-2 order-md-1"><a href="<?php echo "edit.php?id=" . $_SESSION['id'] . "" ?>" class="nav-link" title="settings"><i class="fas fa-cog"></i></a></li>
                     <li class="dropdown order-1">
                         <form action="logout.php">
@@ -113,8 +112,10 @@ if (isset($_POST['submit'])) {
         </div>
     </nav>
     <br><br><br>
+    <div class="row justify-content-center">
+        <h3>Ajouter un mot pour la dictée :</h3>
 
-
+    </div>
     <?php //mot déjà existant
     if (isset($erreurMotExist)) {
     ?>
@@ -165,21 +166,54 @@ if (isset($_POST['submit'])) {
     }
     ?>
 
+    <br><br>
+
     <div class="container">
-        <form action="" method="post" enctype="multipart/form-data">
-            <input type="text" name="mot" id="mot" placeholder="Votre mot">
-            <div class="form-group">
-                <label for="exampleFormControlFile1">Image :</label>
-                <input type="file" name="image" class="form-control-file" id="exampleFormControlFile1">
-            </div>
-            <div class="form-group">
-                <label for="exampleFormControlFile1">Son :</label>
-                <input type="file" name="son" class="form-control-file" id="exampleFormControlFile1">
-            </div>
-            <input type="submit" class="btn btn-primary" name="submit" value="Envoyer">
-        </form>
+        <div class="row justify-content-center">
+            <form action="" method="post" enctype="multipart/form-data">
+
+                <div class="form-group">
+                    <label for="formGroupExampleInput"></label>
+                    <input type="text" name="mot" class="form-control" id="formGroupExampleInput" placeholder="Votre mot...">
+                </div>
+                <div class="form-group">
+                    <label for="exampleFormControlFile1">Image : (jpg, png, gif, jpeg)</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Importer</span>
+                        </div>
+                        <div class="custom-file">
+                            <input type="file" name="image" class="custom-file-input" id="inputGroupFile01">
+                            <label class="custom-file-label" for="inputGroupFile01">Choisir une image</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="exampleFormControlFile1">Son : (mp3)</label>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text">Importer</span>
+                        </div>
+                        <div class="custom-file">
+                            <input type="file" name="son" class="custom-file-input" id="inputGroupFile01">
+                            <label class="custom-file-label" for="inputGroupFile01">Choisir un son</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <input type="submit" class="btn btn-primary" name="submit" value="Ajouter">
+
+                </div>
+            </form>
+        </div>
     </div>
 
 </body>
-
+<script>
+            // Add the following code if you want the name of the file appear on select
+            $(".custom-file-input").on("change", function() {
+                var fileName = $(this).val().split("\\").pop();
+                $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+            });
+        </script>
 </html>

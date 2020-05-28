@@ -2,7 +2,7 @@
 session_start();
 require 'PDOconnexion.php';
 
-if (isset($_POST['nomClasse']) && !empty($_POST['nomClasse']) && isset($_POST['csvUpload'])) {
+if (isset($_POST['nomClasse']) && !empty($_POST['nomClasse']) && isset($_POST['csvUpload']) && !empty($_POST['csvUpload'])) {
     $insertClasse = $bdd->prepare("INSERT INTO `classe` (`nom_classe`) VALUES (?)");
     $insertClasse->execute(array($_POST['nomClasse']));
 
@@ -61,7 +61,7 @@ if (isset($_POST['nomClasse']) && !empty($_POST['nomClasse']) && isset($_POST['c
             </button>
             <div class="collapse navbar-collapse" id="exCollapsingNavbar">
                 <ul class="nav navbar-nav flex-row justify-content-between ml-auto">
-                    <li class="nav-item order-3 order-md-1"><a href="<?php echo "profil_user.php?id=" . $_SESSION['id'] . "" ?>" class="nav-link" title="settings"><i class="fas fa-cog"></i></a></li>
+                    <li class="nav-item order-3 order-md-1"><a href="<?php echo "profil_user.php?id=" . $_SESSION['id'] . "" ?>" class="nav-link" title="settings"><i class="fas fa-user-circle"></i></a></li>
                     <li class="nav-item order-2 order-md-1"><a href="<?php echo "edit.php?id=" . $_SESSION['id'] . "" ?>" class="nav-link" title="settings"><i class="fas fa-cog"></i></a></li>
                     <li class="dropdown order-1">
                         <form action="logout.php">
@@ -98,14 +98,38 @@ if (isset($_POST['nomClasse']) && !empty($_POST['nomClasse']) && isset($_POST['c
 
         //récupération des élèves de la classes
 
-        $reqInfoEleve = $bdd->prepare("SELECT prenom_user, nom_user, mail_user FROM utilisateurs INNER JOIN classe WHERE utilisateurs.id_classe_eleve = classe.id_classe");
-        $reqInfoEleve->execute();
-        $infoEleve = $reqInfoEleve->fetchAll();
+
+        $reqClasse = $bdd->prepare("SELECT id_classe, nom_classe FROM classe");
+        $reqClasse->execute();
+        $nomClasse = $reqClasse->fetchAll();
 
         ?>
 
         <br><br>
-        <caption><?php echo $_POST['nomClasse']; ?></caption>
+        <form action="" method="POST">
+            <div class="input-group">
+                <select name="idClasse" class="custom-select" id="inputGroupSelect04">
+                    <option selected>Choisir une classe...</option>
+                    <?php
+                    foreach ($nomClasse as $classe) {
+                    ?>
+                        <option value="<?php echo $classe[0]; ?>"><?php echo $classe[1]; ?></option>
+                    <?php
+                    } ?>
+                </select>
+                <div class="input-group-append">
+                    <input class="btn btn-outline-secondary" type="submit"></input>
+                </div>
+            </div>
+        </form>
+        
+        <?php
+        echo $_POST['idClasse'];
+        $reqInfoEleve = $bdd->prepare("SELECT prenom_user, nom_user, mail_user FROM utilisateurs INNER JOIN classe ON utilisateurs.id_classe_eleve = classe.id_classe WHERE classe.id_classe = ?");
+        $reqInfoEleve->execute(array($_POST['idClasse']));
+        $infoEleve = $reqInfoEleve->fetchAll();
+        ?>
+
         <div class="container">
             <table class="table">
                 <thead class="thead-dark">
@@ -134,10 +158,10 @@ if (isset($_POST['nomClasse']) && !empty($_POST['nomClasse']) && isset($_POST['c
             </table>
             <div class="row justify-content-center">
                 <a href="mailto:<?php foreach ($infoEleve as $info) {
-                                   echo $info[2].";";
+                                    echo $info[2] . ";";
                                 } ?>
                                 ?subject=Première connexion à Citrouille
-                                   &body=Lien de la connexion : http://localhost/Citrouille/login.php"> 
+                                   &body=Lien de la connexion : http://localhost/Citrouille/login.php">
                     <button class="btn btn-primary">Envoyer un e-mail de connexion.</button></a>
             </div>
         </div>
