@@ -1,3 +1,7 @@
+<?php
+require 'PDOconnexion.php';
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -36,6 +40,7 @@
     <div class="container">
         <div class="row">
             <a href="newClasse.php"><button type="submit" class="btn btn-dark">Ajouter une nouvelle classe</button></a>
+            <a href="newDictee.php"><button type="submit" class="btn btn-dark">Ajouter une nouvelle dictée</button></a>
         </div>
     </div>
 

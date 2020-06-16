@@ -29,8 +29,8 @@ if (isset($_POST['formIns'])) {
                         if ($mdp == $mdpConf) {
                             $insertUser = $bdd->prepare("INSERT INTO `utilisateurs` (`id_user`,`prenom_user`, `nom_user`, `mail_user`,`password_user`,`user_admin`, `pseudo`, `avatar`) VALUES (NULL,?, ?, ?, ?, 1, ?, NULL)");
                             $insertUser->execute(array($prenom, $nom, $email, $hasheMdp, $pseudo));
-                           
-                            $creationValid = "Votre compte a bien été créé !";
+
+                            header('Location: login.php');
                         } else {
                             $erreurMdp = "Vos mots de passes ne correspondent pas !";
                         }
@@ -84,7 +84,11 @@ if (isset($_POST['formIns'])) {
     <div class="container">
 
         <form method="POST" action="">
-
+            <div class="row">
+                <a href="login.php">
+                <button type="button" class="btn btn-primary">Login</button>
+                </a>
+            </div>
             <div class="row justify-content-center">
                 <div class="col-4">
                     <h3>Inscription</h3>

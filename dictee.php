@@ -2,32 +2,46 @@
 require 'PDOconnexion.php';
 
 session_start();
-$iMot = 0;
+// $_SESSION['score'] = 0;
+// $_SESSION['index'] = 0;
 
-$req = $bdd->prepare("SELECT mot FROM mots");
-$req->execute();
-$listMots = $req->fetchAll(PDO::FETCH_COLUMN, 0); //récupération de la liste de mot de la bdd
-
-srand(12345);
-$shuffled = str_shuffle($listMots[$iMot]);
-// $shuffled = str_shuffle($listMots[$iMot]); //mélange du mot random
-
-$reqImgMot = $bdd->prepare("SELECT image FROM mots WHERE mot = ?"); // récup image du mot
-$reqImgMot->execute(array($listMots[$iMot]));
-$imgMot = $reqImgMot->fetch(PDO::FETCH_ASSOC);
-$mot = "";
-foreach ($imgMot as $var) {
-    $mot = $var;
+if (!isset($_SESSION['listMots'])) {
+    $req = $bdd->prepare("SELECT mot FROM mots");
+    $req->execute();
+    $listMots = $req->fetchAll(PDO::FETCH_COLUMN, 0); //récupération de la liste de mot de la bdd
+    $_SESSION['listMots'] = $listMots;
 }
 
+if (!isset($_SESSION['index'])) {
+    $_SESSION['index'] = 0;
+}
 
-$reqSonMot = $bdd->prepare("SELECT son FROM mots WHERE mot = ?"); // récup son du mot
-$reqSonMot->execute(array($listMots[$iMot]));
+if (!isset($_SESSION['score'])) {
+    $_SESSION['score'] = 0;
+}
+
+srand(12345);
+$shuffled = str_shuffle($_SESSION['listMots'][$_SESSION['index']]);
+
+// récup image du mot
+$reqImgMot = $bdd->prepare("SELECT image FROM mots WHERE mot = ?");
+$reqImgMot->execute(array($_SESSION['listMots'][$_SESSION['index']]));
+$imgMot = $reqImgMot->fetch(PDO::FETCH_ASSOC);
+$img = "";
+foreach ($imgMot as $var) {
+    $img = $var;
+}
+
+// récup son du mot
+$reqSonMot = $bdd->prepare("SELECT son FROM mots WHERE mot = ?");
+$reqSonMot->execute(array($_SESSION['listMots'][$_SESSION['index']]));
 $sonMot = $reqSonMot->fetch(PDO::FETCH_ASSOC);
 $son = "";
 foreach ($sonMot as $var) {
     $son = $var;
 }
+
+
 ?>
 
 <!DOCTYPE html>
@@ -52,56 +66,53 @@ foreach ($sonMot as $var) {
             audio.play();
         }
     </script>
-
     <br>
-
     <div class="container">
         <div class="row justify-content-center">
             <div class="imageMot">
-                <img class="rounded-circle" src="/imagesMot/<?php echo $mot; ?>" alt="imageMot" width=400px;>
+                <img class="rounded-circle" src="/imagesMot/<?php echo $img; ?>" alt="imageMot" width=400px;>
             </div>
         </div>
-
         <br>
-
         <div class="row justify-content-center">
             <div class="sonMot">
                 <button class="input-group-text" type="button" value="PLAY" onclick="play()"><i class="fas fa-volume-up"></i></button>
                 <audio src="/sonsMot/<?php echo $son; ?>" id="audio"></audio>
             </div>
         </div>
-
         <br>
         <br>
         <div class="row justify-content-center">
-            <form action="" method="POST">
+            <form action="nextWord.php?indexMot=<?php echo $_SESSION['index'];?>" method="POST">
                 <div class="row justify-content-center">
-                    <input type="text" class="input-group-text" name="finalWord" id="finalWord" disabled value="<?php if (!isset($_POST['lettre'])) {
-                                                                                                                    $_SESSION['flag'] = false;
-                                                                                                                    $_SESSION['lettre'] = "";
-                                                                                                                } else { //value de mot à trouver
-                                                                                                                    $_SESSION['lettre'] = $_SESSION['lettre'] . $_POST['lettre']; // concatenation des lettres
-                                                                                                                    echo $_SESSION['lettre'];
-                                                                                                                } ?>">
+                    <input type="hidden" name="indexMot" value="<?php echo $_SESSION['index']?>">
+                    <input type="text" class="input-group-text" name="finalWord" id="finalWord" value="<?php if (!isset($_POST['lettre'])) {
+                                                                                                            $_SESSION['lettre'] = "";
+                                                                                                        } else { //value du mot à trouver
+                                                                                                            $_SESSION['lettre'] = $_SESSION['lettre'] . $_POST['lettre']; // concatenation des lettres
+                                                                                                            echo $_SESSION['lettre'];
+                                                                                                        } ?>">
+                    <input class="btn btn-warning" name="resetWord" type="submit" value="Annuler">
+                    <?php
+                    if (isset($_POST['resetWord'])) {
+                        $_SESSION['lettre'] = "";
+                    }
+                    ?>
                 </div>
-<br>
+                <br>
                 <?php
-                for ($word=0; $word < 5 ; $word++) { 
-                    # code...
-                }
-                // if ($randomWords >= 0) {
-                for ($i = 0; $i < strlen($listMots[$iMot]); $i++) { //récuperation des lettres du mot
-                    // for ($i = 0; $i < strlen($listMots[$randomWords]); $i++) { //récuperation des lettres du mot random
+                $taille = strlen($_SESSION['listMots'][$_SESSION['index']]);
+                for ($i = 0; $i < $taille; $i++) { //récuperation des lettres du mot
                 ?>
                     <input class="btn btn-info" name="lettre" type="submit" value="<?php echo $shuffled[$i]; ?>">
                 <?php
                 }
-                // }
                 ?>
-
                 <input class="btn btn-info" name="motValide" type="submit" value="Valider">
+
             </form>
         </div>
+        <p>Votre score est de : <?php echo $_SESSION['score']; ?></p>
     </div>
 </body>
 

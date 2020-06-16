@@ -3,6 +3,15 @@ session_start();
 
 require 'PDOconnexion.php';
 
+$reqIdDictee = $bdd->prepare("SELECT id_dictee FROM dictee where nom_dictee = ?");
+$reqIdDictee->execute(array($_SESSION['nomDictee']));
+$idDictee = $reqIdDictee->fetch(PDO::FETCH_ASSOC);
+$_SESSION['idDictee'];
+
+foreach ($idDictee as $var) {
+    $_SESSION['idDictee'] = $var;
+}
+
 if (isset($_POST['submit'])) {
     if (!empty($_FILES['image']) && !empty($_FILES['son'])) {
         //-----upload image----
@@ -37,45 +46,50 @@ if (isset($_POST['submit'])) {
                     $newSonName = $_POST['mot'] . "." . $sonExtLowercase;
                     $sonDest = 'sonsMot/' . $newSonName;
                     move_uploaded_file($sonTmpName, $sonDest);
-
-                    $reqMotExist = $bdd->prepare("SELECT mot FROM mots WHERE mot = ?");  //on recherche si le mot existe déjà
+                    //on recherche si le mot existe déjà
+                    $reqMotExist = $bdd->prepare("SELECT mot FROM mots WHERE mot = ?");
                     $reqMotExist->execute(array($_POST['mot']));
                     $motExist = $reqMotExist->rowCount();
-
-
+                    //s'il existe
                     if ($motExist == 0) {
+                        $_SESSION['mot'] = $_POST['mot'];
                         $insertMot = $bdd->prepare('INSERT INTO `mots`(`mot`, `image`, `son`) VALUES (?,?,?)');
                         $insertMot->execute(array(
-                            $_POST['mot'],
+                            $_SESSION['mot'],
                             $newImgName,
                             $newSonName
                         ));
+                        header('Location: selectMot.php');
                         $uploadSuccess = "Le mot a bien été ajouté.";
                     } else {
-                        $erreurMotExist = "Mot déjà existant dans la base";
+                        $erreurMotExist = "Mot déjà existant dans la base.";
                     }
                 } else {
-                    $erreurVolum = "fichier trop volumineux";
+                    $erreurVolum = "fichier trop volumineux.";
                 }
             } else {
-                $erreurUpload = "erreur upload";
+                $erreurUpload = "erreur upload.";
             }
         } else {
-            $erreurExt = "extension incorrecte";
+            $erreurExt = "extension incorrecte.";
         }
     }
 }
-// if (isset($_POST['submit'])) { //condition qu'on ai envoyé le form
-//     //condition que tous les champs soit remplis
-//     if (isset($_POST['mot']) && !empty($_POST['mot']) && isset($_POST['image']) && !empty($_POST['image']) && isset($_POST['son']) && !empty($_POST['son'])) {
-//         $ajoutMot = $bdd->prepare("INSERT INTO `mots` (`mot`, `image`, `son`) VALUES (?, ?, ?)");
-//         $ajoutMot->execute(array($_POST['mot'], $_POST['image'], $_POST['son']));
-//     } else echo 'Les champs ne sont pas remplis.';
-// }
 
+$reqMots = $bdd->prepare('SELECT id_mot, mot FROM mots ORDER BY mot');
+$reqMots->execute();
+$mots = $reqMots->fetchAll();
 
+if (isset($_POST['idMotExistant'])) {
+    $_SESSION['idMotExistant'] = $_POST['idMotExistant'];
+    header('Location: selectMot.php?mot=' . $_SESSION['mot']);
+}
 
+if (isset($_POST['submit'])) {
+    header('Location: ajoutDictee.php');
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 
@@ -87,6 +101,7 @@ if (isset($_POST['submit'])) {
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <script src="https://kit.fontawesome.com/e765e852d9.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
     <title>Ajout de mot</title>
 </head>
 
@@ -111,67 +126,69 @@ if (isset($_POST['submit'])) {
             </div>
         </div>
     </nav>
-    <br><br><br>
-    <div class="row justify-content-center">
-        <h3>Ajouter un mot pour la dictée :</h3>
+    <div class="container">
+        <br><br><br>
+        <div class="row justify-content-center">
+            <h3>Ajouter un mot pour la dictée : <?php echo $_SESSION['nomDictee']; ?></h3>
 
+        </div>
+        <?php //mot déjà existant
+        if (isset($erreurMotExist)) {
+        ?>
+            <div class="alert alert-warning" role="alert">
+                <?php echo $erreurMotExist; ?>
+            </div>
+        <?php
+        }
+        ?>
+
+        <?php //volume fichier non respecté
+        if (isset($erreurVolum)) {
+        ?>
+            <div class="alert alert-warning" role="alert">
+                <?php echo $erreurVolum; ?>
+            </div>
+        <?php
+        }
+        ?>
+
+        <?php // upload réussi
+        if (isset($uploadSuccess)) {
+        ?>
+            <div class="alert alert-success" role="alert">
+                <?php echo $uploadSuccess; ?>
+            </div>
+        <?php
+        }
+        ?>
+
+        <?php // erreur d'upload
+        if (isset($erreurUpload)) {
+        ?>
+            <div class="alert alert-warning" role="alert">
+                <?php echo $erreurUpload; ?>
+            </div>
+        <?php
+        }
+        ?>
+
+        <?php //erreur d'extension
+        if (isset($erreurExt)) {
+        ?>
+            <div class="alert alert-warning" role="alert">
+                <?php echo $erreurExt; ?>
+            </div>
+        <?php
+        }
+        ?>
+        <br>
     </div>
-    <?php //mot déjà existant
-    if (isset($erreurMotExist)) {
-    ?>
-        <div class="alert alert-warning" role="alert">
-            <?php echo $erreurMotExist; ?>
-        </div>
-    <?php
-    }
-    ?>
-
-    <?php //volume fichier non respecté
-    if (isset($erreurVolum)) {
-    ?>
-        <div class="alert alert-warning" role="alert">
-            <?php echo $erreurVolum; ?>
-        </div>
-    <?php
-    }
-    ?>
-
-    <?php // upload réussi
-    if (isset($uploadSuccess)) {
-    ?>
-        <div class="alert alert-success" role="alert">
-            <?php echo $uploadSuccess; ?>
-        </div>
-    <?php
-    }
-    ?>
-
-    <?php // erreur d'upload
-    if (isset($erreurUpload)) {
-    ?>
-        <div class="alert alert-warning" role="alert">
-            <?php echo $erreurUpload; ?>
-        </div>
-    <?php
-    }
-    ?>
-
-    <?php //erreur d'extension
-    if (isset($erreurExt)) {
-    ?>
-        <div class="alert alert-warning" role="alert">
-            <?php echo $erreurExt; ?>
-        </div>
-    <?php
-    }
-    ?>
-
-    <br><br>
 
     <div class="container">
-        <div class="row justify-content-center">
-            <form action="" method="post" enctype="multipart/form-data">
 
+        <div class="row justify-content-center">
+
+            <form action="" method="post" enctype="multipart/form-data">
                 <div class="form-group">
                     <label for="formGroupExampleInput"></label>
                     <input type="text" name="mot" class="form-control" id="formGroupExampleInput" placeholder="Votre mot...">
@@ -202,18 +219,82 @@ if (isset($_POST['submit'])) {
                 </div>
                 <div class="row justify-content-center">
                     <input type="submit" class="btn btn-primary" name="submit" value="Ajouter">
-
                 </div>
             </form>
+
         </div>
+        <br>
+        <div class="row justify-content-center">
+            <h3>Ou, choississez en un déjà existant...</h3>
+        </div>
+        <br>
+        <div class="row justify-content-center">
+            <form method="POST">
+                <div class="input-group">
+                    <select name="idMotExistant" class="custom-select" id="inputGroupSelect04">
+                        <?php
+                        $motsExistant;
+
+                        foreach ($mots as $var) {
+                            $motExistant = $var;
+                        ?>
+                            <option value="<?php echo $var[0] ?>"><?php echo $var[1] ?></option>
+                        <?php
+                        }
+                        ?>
+                    </select>
+                    <div class="input-group-append">
+                        <input class="btn btn-outline-secondary" type="submit" value="Envoyer">
+                    </div>
+                    <a href="ajoutDictee.php"><button type='button' class="btn btn-outline-primary">Ajouter la dictée</button></a>
+                </div>
+            </form>
+
+        </div>
+        <br>
+        <br><br>
+
+        <?php
+        $reqMotTable = $bdd->prepare('SELECT mot FROM mots  INNER JOIN liste  ON mots.id_mot = liste.id_m   INNER JOIN dictee   ON liste.id_d = dictee.id_dictee   WHERE id_dictee =?;');
+        $reqMotTable->execute(array(
+            $_SESSION['idDictee']
+        ));
+        $motTable = $reqMotTable->fetchAll();
+        ?>
+        <div class="row justify-content-center ">
+            <table class="table" style="width:250px;">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Mots Ajoutés</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    $i = 1;
+                    foreach ($motTable as $mot) {
+                    ?>
+                        <tr style="width:auto;">
+                            <th scope="row"><?php echo $i++;  ?></th>
+                            <td><?php echo $mot[0]; ?></td>
+                        </tr>
+                    <?php
+                    }
+                    ?>
+                </tbody>
+            </table>
+        </div>
+
     </div>
 
 </body>
 <script>
-            // Add the following code if you want the name of the file appear on select
-            $(".custom-file-input").on("change", function() {
-                var fileName = $(this).val().split("\\").pop();
-                $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
-            });
-        </script>
+    // Add the following code if you want the name of the file appear on select
+    $(".custom-file-input").on("change", function() {
+        var fileName = $(this).val().split("\\").pop();
+        $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+    });
+</script>
+
 </html>

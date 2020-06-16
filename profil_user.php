@@ -9,7 +9,9 @@ if (isset($_GET['id']) && $_GET['id'] > 0) {
     $reqUser = $bdd->prepare('SELECT * FROM utilisateurs WHERE id_user = ?');
     $reqUser->execute(array($getId));
     $userInfo = $reqUser->fetch();
+    
 }
+
 if (isset($_FILES['avatar']) && !empty($_FILES['avatar']['name'])) {
     $tailleMax =  2097152;
     $extValide = array('jpg', 'jpeg', 'gif', 'png');
@@ -24,7 +26,7 @@ if (isset($_FILES['avatar']) && !empty($_FILES['avatar']['name'])) {
                     'avatar' => $_SESSION['id'] . "." . $extUpload,
                     'id' => $_SESSION['id']
                 ));
-                header('Location: profil_admin.php?id=' . $_SESSION['id']);
+                header('Location: profil_user.php?id=' . $_SESSION['id']);
             } else {
                 $erreurPwd = "L'importation a échoué.";
             }
@@ -54,7 +56,7 @@ if (isset($_FILES['avatar']) && !empty($_FILES['avatar']['name'])) {
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" role="navigation">
         <div class="container">
-            <a class="navbar-brand" href="<?php echo "accueil_admin.php?id=".$_SESSION['id']; ?>">Citrouille</a>
+            <a class="navbar-brand" href="<?php echo "accueil_user.php?id=".$_SESSION['id']; ?>">Citrouille</a>
             <button class="navbar-toggler border-0" type="button" data-toggle="collapse" data-target="#exCollapsingNavbar">
                 &#9776;
             </button>
